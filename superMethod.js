@@ -1,32 +1,32 @@
 import getCaller from "./getCaller";
 
-function getMethodFromComponent(methodName, parentComponentOptions, skipTimes) {
-    const componentMethod = getMethodsMethod(methodName, parentComponentOptions, skipTimes);
+function getMethodFromComponent(methodName, parentComponentOptions, methodStat) {
+    const componentMethod = getMethodsMethod(methodName, parentComponentOptions, methodStat);
 
     if (componentMethod) {
         return componentMethod;
     }
 
-    const mixinsMethod = getMixinsMethod(methodName, parentComponentOptions, skipTimes);
+    const mixinsMethod = getMixinsMethod(methodName, parentComponentOptions, methodStat);
 
     if (mixinsMethod) {
         return mixinsMethod;
     }
 
-    return getExtendsMethod(methodName, parentComponentOptions, skipTimes);
+    return getExtendsMethod(methodName, parentComponentOptions, methodStat);
 }
 
-function getExtendsMethod(methodName, parentComponentOptions, skipTimes) {
+function getExtendsMethod(methodName, parentComponentOptions, methodStat) {
     const extendsComponentOptions = parentComponentOptions.extends;
 
     if (!extendsComponentOptions) {
         return false;
     }
 
-    return getMethodFromComponent(methodName, extendsComponentOptions, skipTimes);
+    return getMethodFromComponent(methodName, extendsComponentOptions, methodStat);
 }
 
-function getMethodsMethod(methodName, componentOptions, skipTimes) {
+function getMethodsMethod(methodName, componentOptions, methodStat) {
     const methods = componentOptions.methods;
 
     if (!methods) {
@@ -39,16 +39,22 @@ function getMethodsMethod(methodName, componentOptions, skipTimes) {
         return false;
     }
 
-    if (skipTimes) {
-        skipTimes--;
+    if (methodStat.skipTimes) {
+        methodStat.skipTimes--;
 
-        return getParentMethod(componentOptions, methodName, skipTimes);
+        return getParentMethod(componentOptions, methodName, methodStat);
+    }
+
+    debugger;
+    // First $super() caller is method in mixin/extends - skip it and continue search base method
+    if ((methodStat.skipTimes === 0) && (methodStat.origFunction === method)) {
+        return false;
     }
 
     return method;
 }
 
-function getMixinsMethod(methodName, parentComponentOptions, skipTimes) {
+function getMixinsMethod(methodName, parentComponentOptions, methodStat) {
     const mixins = parentComponentOptions.mixins;
 
     if (!mixins) {
@@ -58,7 +64,7 @@ function getMixinsMethod(methodName, parentComponentOptions, skipTimes) {
     const reversedMixins = Array.from(mixins).reverse();
 
     for (const mixinComponentOptions of reversedMixins) {
-        const mixinMethod = getMethodFromComponent(methodName, mixinComponentOptions, skipTimes);
+        const mixinMethod = getMethodFromComponent(methodName, mixinComponentOptions, methodStat);
 
         if (mixinMethod) {
             return mixinMethod;
@@ -72,36 +78,60 @@ function getCallerMethodName() {
     return getCaller(3).split('.')[1];
 }
 
-function getParentMethod(componentOptions, methodName, skipTimes) {
-    const mixinsMethod = getMixinsMethod(methodName, componentOptions, skipTimes);
+function getParentMethod(componentOptions, methodName, methodStat) {
+    const mixinsMethod = getMixinsMethod(methodName, componentOptions, methodStat);
 
     if (mixinsMethod) {
         return mixinsMethod;
     }
 
-    const extendsMethod = getExtendsMethod(methodName, componentOptions, skipTimes);
+    const extendsMethod = getExtendsMethod(methodName, componentOptions, methodStat);
 
     if (extendsMethod) {
         return extendsMethod;
     }
 
-    throw Error('Super method not found!');
+    return false;
 }
 
-const skipCount = {};
-
 export default function () {
-    debugger;
     const methodName = getCallerMethodName();
 
-    debugger;
-    skipCount.hasOwnProperty(methodName) ? skipCount[methodName]++ : skipCount[methodName] = 0;
-
     const componentOptions = this.$options;
-    const parentMethod = getParentMethod(componentOptions, methodName, skipCount[methodName]);
+
+    // first call for component instance
+    if (!this.__super) {
+        this.__super = {};
+    }
+
+    const superGlobals = this.__super;
+
+    // first call for method
+    if (!superGlobals.hasOwnProperty(methodName)) {
+        superGlobals[methodName] = {
+            origFunction: componentOptions.methods[methodName],
+            callLevel: -1,
+            skipTimes: 0,
+            levelsCache: {},
+        };
+    }
+
+    const methodStat = superGlobals[methodName];
+    methodStat.callLevel++;
+
+    const parentMethod = (methodStat.levelsCache[methodStat.callLevel])
+        ? methodStat.levelsCache[methodStat.callLevel]
+        : getParentMethod(componentOptions, methodName, methodStat);
+
+    if (!parentMethod) {
+        throw Error('Super method not found!');
+    }
+
+    methodStat.levelsCache[methodStat.callLevel] = parentMethod;
 
     const result = parentMethod.apply(this, arguments);
-    skipCount[methodName]--;
+
+    methodStat.callLevel--;
 
     return result;
 }
