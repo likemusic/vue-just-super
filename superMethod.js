@@ -7,23 +7,23 @@ function getMethodFromComponent(methodName, parentComponentOptions, skipTimes) {
         return componentMethod;
     }
 
-    const mixinsMethod = getMixinsMethod(methodName, parentComponentOptions);
+    const mixinsMethod = getMixinsMethod(methodName, parentComponentOptions, skipTimes);
 
     if (mixinsMethod) {
         return mixinsMethod;
     }
 
-    return getExtendsMethod(methodName, parentComponentOptions);
+    return getExtendsMethod(methodName, parentComponentOptions, skipTimes);
 }
 
-function getExtendsMethod(methodName, parentComponentOptions) {
+function getExtendsMethod(methodName, parentComponentOptions, skipTimes) {
     const extendsComponentOptions = parentComponentOptions.extends;
 
     if (!extendsComponentOptions) {
         return false;
     }
 
-    return getMethodFromComponent(methodName, extendsComponentOptions);
+    return getMethodFromComponent(methodName, extendsComponentOptions, skipTimes);
 }
 
 function getMethodsMethod(methodName, componentOptions, skipTimes) {
