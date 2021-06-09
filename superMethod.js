@@ -1,7 +1,7 @@
 import getCaller from "./getCaller";
 
-function getMethodFromComponent(methodName, parentComponentOptions) {
-    const componentMethod = getMethodsMethod(methodName, parentComponentOptions);
+function getMethodFromComponent(methodName, parentComponentOptions, skipTimes) {
+    const componentMethod = getMethodsMethod(methodName, parentComponentOptions, skipTimes);
 
     if (componentMethod) {
         return componentMethod;
@@ -26,8 +26,8 @@ function getExtendsMethod(methodName, parentComponentOptions) {
     return getMethodFromComponent(methodName, extendsComponentOptions);
 }
 
-function getMethodsMethod(methodName, parentComponentOptions) {
-    const methods = parentComponentOptions.methods;
+function getMethodsMethod(methodName, componentOptions, skipTimes) {
+    const methods = componentOptions.methods;
 
     if (!methods) {
         return false;
@@ -39,10 +39,16 @@ function getMethodsMethod(methodName, parentComponentOptions) {
         return false;
     }
 
+    if (skipTimes) {
+        skipTimes--;
+
+        return getParentMethod(componentOptions, methodName, skipTimes);
+    }
+
     return method;
 }
 
-function getMixinsMethod(methodName, parentComponentOptions) {
+function getMixinsMethod(methodName, parentComponentOptions, skipTimes) {
     const mixins = parentComponentOptions.mixins;
 
     if (!mixins) {
@@ -52,7 +58,7 @@ function getMixinsMethod(methodName, parentComponentOptions) {
     const reversedMixins = Array.from(mixins).reverse();
 
     for (const mixinComponentOptions of reversedMixins) {
-        const mixinMethod = getMethodFromComponent(methodName, mixinComponentOptions);
+        const mixinMethod = getMethodFromComponent(methodName, mixinComponentOptions, skipTimes);
 
         if (mixinMethod) {
             return mixinMethod;
@@ -63,25 +69,17 @@ function getMixinsMethod(methodName, parentComponentOptions) {
 }
 
 function getCallerMethodName() {
-    /**
-     * Callers:
-     * 0 - "Module.eval [as default]"
-     * 1 - "eval"
-     * 2 - "getCallerMethodName"
-     * 3 - "VueComponent.eval [as $super]"
-     */
-    return getCaller(4).split('.')[1];
+    return getCaller(3).split('.')[1];
 }
 
-function getParentMethod(component, methodName) {
-    const componentOptions = component.$options;
-    const mixinsMethod = getMixinsMethod(methodName, componentOptions, this);
+function getParentMethod(componentOptions, methodName, skipTimes) {
+    const mixinsMethod = getMixinsMethod(methodName, componentOptions, skipTimes);
 
     if (mixinsMethod) {
         return mixinsMethod;
     }
 
-    const extendsMethod = getExtendsMethod(methodName, componentOptions, this);
+    const extendsMethod = getExtendsMethod(methodName, componentOptions, skipTimes);
 
     if (extendsMethod) {
         return extendsMethod;
@@ -90,10 +88,20 @@ function getParentMethod(component, methodName) {
     throw Error('Super method not found!');
 }
 
+const skipCount = {};
+
 export default function () {
     debugger;
     const methodName = getCallerMethodName();
-    const parentMethod = getParentMethod(this, methodName);
 
-    return parentMethod.apply(this, arguments);
+    debugger;
+    skipCount.hasOwnProperty(methodName) ? skipCount[methodName]++ : skipCount[methodName] = 0;
+
+    const componentOptions = this.$options;
+    const parentMethod = getParentMethod(componentOptions, methodName, skipCount[methodName]);
+
+    const result = parentMethod.apply(this, arguments);
+    skipCount[methodName]--;
+
+    return result;
 }
