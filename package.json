@@ -1,0 +1,27 @@
+{
+  "name": "vue-just-super",
+  "version": "0.0.1",
+  "description": "Vue 2 plugin that allows you to call `this.$super(arguments)` in vue child component's methods (components composed by `extends` or `mixins` options).",
+  "keywords": [
+    "vue",
+    "super",
+    "inherit",
+    "extend",
+    "extends",
+    "mixin",
+    "mixins",
+    "override",
+    "overload",
+    "parent",
+    "child",
+    "call"
+  ],
+  "main": "index.js",
+  "repository": "https://github.com/likemusic/vue-just-super.git",
+  "author": "Valerij Ivashchenko <likemusicdev@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "vue": "^2.6.11"
+  }
+}
