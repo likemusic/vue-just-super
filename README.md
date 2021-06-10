@@ -1,6 +1,7 @@
 # vue-just-super
 
-Vue 2 plugin that allows you to call `this.$super(arguments)` in vue child component's methods (components composed by `extends` or `mixins` options).
+Vue 2 plugin that allows you to call `this.$super(arguments)` in vue child component's methods (components composed
+by `extends` or `mixins` options).
 
 ## Installation
 
@@ -11,6 +12,7 @@ npm npm i --save vue-just-super
 ```
 
 or
+
 ```
 yarn add vue-just-super
 ```
@@ -26,6 +28,7 @@ Vue.use(VueJustSuper);
 ## Usage
 
 For example, your base component is:
+
 ```
 <!-- Base.vue -->
 <template>
@@ -49,6 +52,7 @@ For example, your base component is:
 ```
 
 Child component that extends base component is:
+
 ```
 <!-- Child.vue -->
 <script>
@@ -69,14 +73,17 @@ Child component that extends base component is:
 ```
 
 If your app has template:
+
 ```xml
-  <div>
-    <base />
-    <child />
-  </div>
+
+<div>
+    <base/>
+    <child/>
+</div>
 ```
 
 you will see in console:
+
 ```
 --- Base ---
 Hello from Base!
@@ -87,18 +94,30 @@ Hello from Child!
 
 ```
 
-You could do the same if you compose your component by `mixins` option.
-Also, you could call grandparent methods in deep-nested inherited child.
-
+You could do the same if you compose your component by `mixins` option. Also, you could call grandparent methods in
+deep-nested inherited child.
 
 ## Implementation details
 
-In `this.$super` parents recursively iterated for lookup method with name given from stacktrace and then call it with [apply()](https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/Function/apply).
+In `this.$super` parents recursively iterated for lookup method with name given from stacktrace and then call it
+with [apply()](https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/Function/apply).
 
 ## Motivation
 
-According to ["super() in a method overriden via Vue.extend"](https://github.com/vuejs/vue/issues/2977#issuecomment-222878609) thread [Evan You](https://github.com/yyx990803)  don't want to introduce `this.$super()` (and I still don't understand why while `extends` and `mixins` options exists).
+According
+to ["super() in a method overriden via Vue.extend"](https://github.com/vuejs/vue/issues/2977#issuecomment-222878609)
+thread [Evan You](https://github.com/yyx990803)  don't want to introduce `this.$super()` (and I still don't understand
+why while `extends` and `mixins` options exists).
 
-Unfortunately exists implementation like [vue-super](https://www.npmjs.com/package/vue-super) / [vue-super-call](https://www.npmjs.com/package/vue-super-call) / etc. required to pass base component to super-method and/or not supports deep-nested inheritance.
+Unfortunately exists implementation like [vue-super](https://www.npmjs.com/package/vue-super)
+/ [vue-super-call](https://www.npmjs.com/package/vue-super-call) / etc. required to pass base component to super-method
+and/or not supports deep-nested inheritance.
 
-So to have possibilities to call method from parent component by just call `this.$super(arguments)` this module has been created.
+So to have possibilities to call in child component method from parent component by just call `this.$super(arguments)`
+this module has been created.
+
+## TODO
+
+- Share methods cache between instances of the same component;
+- Maybe use generator when iterate inheritance tree for lookup method on different level (to skip iteration over already
+  found levels). 

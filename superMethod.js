@@ -45,7 +45,6 @@ function getMethodsMethod(methodName, componentOptions, methodStat) {
         return getParentMethod(componentOptions, methodName, methodStat);
     }
 
-    debugger;
     // First $super() caller is method in mixin/extends - skip it and continue search base method
     if ((methodStat.skipTimes === 0) && (methodStat.origFunction === method)) {
         return false;
