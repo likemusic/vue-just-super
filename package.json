@@ -4,6 +4,7 @@
   "description": "Vue 2 plugin that allows you to call `this.$super(arguments)` in vue child component's methods (components composed by `extends` or `mixins` options).",
   "keywords": [
     "vue",
+    "vuejs",
     "super",
     "inherit",
     "extend",

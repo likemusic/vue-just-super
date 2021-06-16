@@ -127,6 +127,7 @@ export default function () {
     }
 
     methodStat.levelsCache[methodStat.callLevel] = parentMethod;
+    methodStat.skipTimes++;
 
     const result = parentMethod.apply(this, arguments);
 
