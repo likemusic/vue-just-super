@@ -1,5 +1,7 @@
 # vue-just-super
 
+[![likemusic/vue-just-super](https://circleci.com/gh/likemusic/vue-just-super.svg?style=shield)](https://app.circleci.com/pipelines/github/likemusic/vue-just-super?branch=master)
+
 Vue 2 plugin that allows you to call `this.$super(arguments)` in vue child component's methods (components composed
 by `extends` or `mixins` options).
 
