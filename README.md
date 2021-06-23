@@ -36,39 +36,40 @@ For example, your base component is:
 </template>
 
 <script>
-    export default {
-        name: "Base",
-        methods: {
-            hello() {
-                console.log('Hello from Base!');
-            },
-            wrappedHello() {
-                console.log('--- ' . this.options.name . ' ---');
-                this.hello();
-            }
-        }
-    }
+export default {
+    name: "Base",
+    methods: {
+        hello() {
+            console.log('Hello from Base!');
+        },
+        wrappedHello() {
+            console.log('--- ' + this.$options.name + ' ---');
+            this.hello();
+        },
+    },
+}
 </script>
 ```
 
-Child component that extends base component is:
+ChildWithExtendsNoMixinsWithOwn component that extends base component is:
 
 ```
-<!-- Child.vue -->
+<!-- ChildWithExtendsNoMixinsWithOwn.vue -->
 <script>
-    import Child from './Base';
-    
-    export default {
-        name: "Child",
-        extends: Base,
-        methods: {
-            hello() {
-                this.$super();
-                
-                console.log('Hello from Child!');
-            }
-        }
-    }
+
+import Base from "./Base";
+
+export default {
+    name: "ChildWithExtendsNoMixinsWithOwn",
+    extends: Base,
+    methods: {
+        hello() {
+            this.$super();
+
+            console.log('Hello from ChildWithExtendsNoMixinsWithOwn!');
+        },
+    },
+}
 </script>
 ```
 
@@ -77,8 +78,8 @@ If your app has template:
 ```xml
 
 <div>
-    <base/>
-    <child/>
+    <Base/>
+    <ChildWithExtendsNoMixinsWithOwn/>
 </div>
 ```
 
@@ -87,11 +88,9 @@ you will see in console:
 ```
 --- Base ---
 Hello from Base!
-
---- Child ---
+--- ChildWithExtendsNoMixinsWithOwn ---
 Hello from Base!
-Hello from Child!
-
+Hello from ChildWithExtendsNoMixinsWithOwn!
 ```
 
 You could do the same if you compose your component by `mixins` option. Also, you could call grandparent methods in
@@ -99,8 +98,7 @@ deep-nested inherited child.
 
 ## Implementation details
 
-In `this.$super` parents recursively iterated for lookup method with name given from stacktrace and then call it
-with [apply()](https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/Function/apply).
+In `this.$super` parents recursively iterated for lookup method with name given from stacktrace and then call it.
 
 ## Motivation
 
