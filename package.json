@@ -18,11 +18,27 @@
     "call"
   ],
   "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
   "repository": "https://github.com/likemusic/vue-just-super.git",
   "author": "Valerij Ivashchenko <likemusicdev@gmail.com>",
   "license": "MIT",
   "private": false,
   "dependencies": {
+    "error-stack-parser": "^2.0.6",
     "vue": "^2.6.11"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.14.5",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/vue": "^5.6.2",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^27.0.2",
+    "eslint-plugin-jest": "^24.3.6",
+    "eslint-plugin-testing-library": "^4.6.0",
+    "jest": "^27.0.4",
+    "vue-jest": "^3.0.7",
+    "vue-template-compiler": "^2.6.14"
   }
 }
