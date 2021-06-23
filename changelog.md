@@ -1,5 +1,5 @@
 # Changelog
 
-## 0.0.1 (2021-06-09)
+## 0.0.1 (2021-06-23)
 
-Initial release. There is temporary no tests.
+Initial release.
