@@ -8,7 +8,6 @@ export default {
     mixins: [ChildMixinNoSuper, FakeMixin,],
     methods: {
         helloMessage() {
-            debugger;
             return this.$super() + ' > ChildNoExtendsWithMixinsNoSuperWithOwn';
         },
     },

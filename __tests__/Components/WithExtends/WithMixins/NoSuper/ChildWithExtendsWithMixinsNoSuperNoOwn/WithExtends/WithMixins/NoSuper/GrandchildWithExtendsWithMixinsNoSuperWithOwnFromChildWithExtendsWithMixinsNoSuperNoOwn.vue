@@ -8,7 +8,6 @@ export default {
     mixins: [GrandchildMixinNoSuper],
     methods: {
         helloMessage() {
-            debugger;
             return this.$super() + ' > GrandchildWithExtendsWithMixinsNoSuperWithOwnFromChildWithExtendsWithMixinsNoSuperNoOwn';
         },
     }

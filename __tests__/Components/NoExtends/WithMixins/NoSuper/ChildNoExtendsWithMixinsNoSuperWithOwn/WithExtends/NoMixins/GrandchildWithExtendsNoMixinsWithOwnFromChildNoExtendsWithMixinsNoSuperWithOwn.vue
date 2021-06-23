@@ -6,7 +6,6 @@ export default {
     extends: ChildNoExtendsWithMixinsNoSuperWithOwn,
     methods: {
         helloMessage() {
-            debugger;
             return this.$super() + ' > GrandchildWithExtendsNoMixinsWithOwnFromChildNoExtendsWithMixinsNoSuperWithOwn';
         },
     }

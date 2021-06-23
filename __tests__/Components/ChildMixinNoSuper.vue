@@ -8,7 +8,6 @@ export default {
     name: "ChildMixinNoSuper",
     methods: {
         helloMessage() {
-            debugger;
             return 'ChildMixinNoSuper';
         },
         wrappedHelloMessage() {

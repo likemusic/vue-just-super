@@ -95,7 +95,6 @@ function getParentMethod(componentOptions, methodName, methodStat) {
 }
 
 export default function () {
-    debugger;
     const methodName = getCallerMethodName();
 
     const componentOptions = this.$options;

@@ -22,22 +22,5 @@ export default {
 
             return sub;
         };
-
-/*
-        Vue.mixin({
-            beforeCreate() {
-                debugger;
-                const a = this;
-
-                const options = this.$options;
-            },
-            created() {
-                debugger;
-                const a = this;
-
-                const options = this.$options;
-            }
-        })
-*/
     },
 }
