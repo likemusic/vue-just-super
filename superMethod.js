@@ -39,15 +39,16 @@ function getMethodsMethod(methodName, componentOptions, methodStat) {
         return false;
     }
 
+    // First $super() caller is method in mixin/extends - skip it and continue search base method
+    if (methodStat.origFunction === method) {
+        return false;
+    }
+
     if (methodStat.skipTimes) {
         methodStat.skipTimes--;
 
-        return getParentMethod(componentOptions, methodName, methodStat);
-    }
-
-    // First $super() caller is method in mixin/extends - skip it and continue search base method
-    if ((methodStat.skipTimes === 0) && (methodStat.origFunction === method)) {
         return false;
+        // return getParentMethod(componentOptions, methodName, methodStat);
     }
 
     return method;
@@ -94,6 +95,7 @@ function getParentMethod(componentOptions, methodName, methodStat) {
 }
 
 export default function () {
+    debugger;
     const methodName = getCallerMethodName();
 
     const componentOptions = this.$options;
@@ -110,13 +112,15 @@ export default function () {
         superGlobals[methodName] = {
             origFunction: componentOptions.methods[methodName],
             callLevel: -1,
-            skipTimes: 0,
+            skipTimes: -1,
             levelsCache: {},
         };
     }
 
     const methodStat = superGlobals[methodName];
     methodStat.callLevel++;
+    // methodStat.skipTimes = methodStat.callLevel;
+    methodStat.skipTimes = methodStat.callLevel;
 
     const parentMethod = (methodStat.levelsCache[methodStat.callLevel])
         ? methodStat.levelsCache[methodStat.callLevel]
@@ -127,9 +131,13 @@ export default function () {
     }
 
     methodStat.levelsCache[methodStat.callLevel] = parentMethod;
-    methodStat.skipTimes++;
 
-    const result = parentMethod.apply(this, arguments);
+    const oldMethod = this[methodName];
+
+    // don't use apply to not method name in stack
+    this[methodName] = parentMethod;
+    const result = this[methodName](...arguments);
+    this[methodName] = oldMethod;
 
     methodStat.callLevel--;
 
