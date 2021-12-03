@@ -2,7 +2,7 @@
 
 [![likemusic/vue-just-super](https://circleci.com/gh/likemusic/vue-just-super.svg?style=shield)](https://app.circleci.com/pipelines/github/likemusic/vue-just-super?branch=master)
 
-Vue 2 plugin that allows you to call `this.$super(arguments)` in vue child component's methods (components composed
+Vue 2 plugin that allows you to call `this.$super(...arguments)` in vue child component's methods (components composed
 by `extends` or `mixins` options).
 
 ## Installation
@@ -113,7 +113,7 @@ Unfortunately exists implementation like [vue-super](https://www.npmjs.com/packa
 / [vue-super-call](https://www.npmjs.com/package/vue-super-call) / etc. required to pass base component to super-method
 and/or not supports deep-nested inheritance.
 
-So to have possibilities to call in child component method from parent component by just call `this.$super(arguments)`
+So to have possibilities to call in child component method from parent component by just call `this.$super(...arguments)`
 this module has been created.
 
 ## TODO

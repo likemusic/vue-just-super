@@ -27,7 +27,8 @@ function getExtendsMethod(methodName, parentComponentOptions, methodStat) {
 }
 
 function getMethodsMethod(methodName, componentOptions, methodStat) {
-    const methods = componentOptions.methods;
+    const optionPropertyName = methodStat.optionPropertyName;
+    const methods = componentOptions[optionPropertyName];
 
     if (!methods) {
         return false;
@@ -94,6 +95,22 @@ function getParentMethod(componentOptions, methodName, methodStat) {
     return false;
 }
 
+function getComputedGetterRecursively(vm, propName) {
+    const propsDescription = Object.getOwnPropertyDescriptor(vm, propName);
+
+    if (!propsDescription) {
+        const proto = vm.__proto__;
+
+        if (!proto) {
+            throw new Error('Computed getters not found.');
+        }
+
+        return getComputedGetterRecursively(proto, propName);
+    }
+
+    return propsDescription.get;
+}
+
 export default function () {
     const methodName = getCallerMethodName();
 
@@ -106,10 +123,15 @@ export default function () {
 
     const superGlobals = this.__super;
 
+    const optionPropertyName = componentOptions.methods[methodName] ? 'methods' : 'computed';
+
     // first call for method
     if (!superGlobals.hasOwnProperty(methodName)) {
+        const origFunction = componentOptions[optionPropertyName][methodName];
+
         superGlobals[methodName] = {
-            origFunction: componentOptions.methods[methodName],
+            optionPropertyName: optionPropertyName,
+            origFunction: origFunction,
             callLevel: -1,
             skipTimes: -1,
             levelsCache: {},
@@ -131,12 +153,35 @@ export default function () {
 
     methodStat.levelsCache[methodStat.callLevel] = parentMethod;
 
-    const oldMethod = this[methodName];
+    let result;
 
-    // don't use apply to not method name in stack
-    this[methodName] = parentMethod;
-    const result = this[methodName](...arguments);
-    this[methodName] = oldMethod;
+    if (optionPropertyName === 'methods') {
+        const oldMethod = this[methodName];
+
+        // don't use apply to not method name in stack
+        this[methodName] = parentMethod;
+        result = this[methodName](...arguments);
+        this[methodName] = oldMethod;
+    } else {
+        const oldMethod = getComputedGetterRecursively(this, methodName);
+
+        Object.defineProperty(this, methodName, {
+            configurable: true,
+            enumerable: true,
+            get: function () {
+                return parentMethod.call(this);
+            },
+        });
+
+        result = this[methodName];
+
+        //todo: must be set on parent proto
+        Object.defineProperty(this, methodName, {
+            configurable: true,
+            enumerable: true,
+            get: oldMethod,
+        });
+    }
 
     methodStat.callLevel--;
 

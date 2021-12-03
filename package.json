@@ -1,7 +1,7 @@
 {
   "name": "vue-just-super",
   "version": "0.0.1",
-  "description": "Vue 2 plugin that allows you to call `this.$super(arguments)` in vue child component's methods (components composed by `extends` or `mixins` options).",
+  "description": "Vue 2 plugin that allows you to call `this.$super(arguments)` in vue child component's methods and computed (components composed by `extends` or `mixins` options).",
   "keywords": [
     "vue",
     "vuejs",
